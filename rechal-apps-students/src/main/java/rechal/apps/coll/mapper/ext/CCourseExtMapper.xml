@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.CCourseMapperExt" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CCourse" >
+    <id column="K_ID" property="kId" jdbcType="BIGINT" />
+    <result column="K_NO" property="kNo" jdbcType="VARCHAR" />
+    <result column="K_NAME" property="kName" jdbcType="VARCHAR" />
+    <result column="K_CREATE_DATE" property="kCreateDate" jdbcType="DATE" />
+    <result column="K_NOTE" property="kNote" jdbcType="VARCHAR" />
+  </resultMap>
+  
+
+  <sql id="Base_Column_List" >
+    K_ID, K_NO, K_NAME, K_CREATE_DATE, K_NOTE
+  </sql>
+  
+  <select id="selectByPage" resultMap="BaseResultMap" parameterType="rechal.apps.coll.model.CourseModel" >
+    select
+    <include refid="Base_Column_List" />
+    from C_COURSE
+    where 1=1
+    <if test="course.kName != null and ''.toString()!=course.kName" >
+    <bind name="pattern" value="'%'+course.kName+'%'"/>
+    AND  K_NAME LIKE #{pattern,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <insert id="insertCourse" parameterType="rechal.apps.coll.entity.CCourse" useGeneratedKeys="true" keyProperty="kId"  keyColumn="K_ID">
+    insert into C_COURSE (K_NO, K_NAME, 
+      K_CREATE_DATE, K_NOTE)
+    values (#{kNo,jdbcType=VARCHAR}, #{kName,jdbcType=VARCHAR}, 
+      #{kCreateDate,jdbcType=DATE}, #{kNote,jdbcType=VARCHAR})
+  </insert>
+  
+  <update id="addMarkCourse" parameterType="rechal.apps.coll.entity.CCourse">
+   <if test="kNo != null and ''.toString()!=kNo" >
+   <bind name="pattern" value="'M_'+kNo"/>
+    ALTER TABLE C_MARK ADD (${pattern} DOUBLE)
+    </if>
+  </update>
+  
+  
+  <select id="cacheCourseKeyName" resultMap="BaseResultMap" >
+    select K_ID, K_NO, K_NAME, K_CREATE_DATE, K_NOTE
+    from C_COURSE
+  </select>
+
+</mapper>

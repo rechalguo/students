@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.BaseInfoMapper" >
+  
+  
+  <select id="selectGrade" resultType="java.util.HashMap" parameterType="rechal.apps.coll.model.BaseInfoModel" >
+    select
+    	G_ID id,
+    	G_NAME text
+    from C_GRADE
+    where 1=1
+    <if test="p != null and ''.toString()!=p">
+    <bind name="pattern" value="'%'+p+'%'"/>
+    AND G_NAME LIKE #{pattern,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <select id="selectTermedbyPage" resultType="java.util.HashMap" parameterType="rechal.apps.coll.model.BaseInfoModel" >
+    select
+    	M_NO id,
+    	M_NO text
+    from C_TERMED
+    where 1=1
+    <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(p)">
+    <bind name="pattern" value="'%'+p+'%'"/>
+    AND M_NO LIKE #{pattern,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+</mapper>

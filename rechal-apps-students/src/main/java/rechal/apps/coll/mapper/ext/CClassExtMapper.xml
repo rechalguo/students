@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.CClassMapperExt" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CClass" >
+    <id column="C_ID" property="cId" jdbcType="BIGINT" />
+    <result column="C_NAME" property="cName" jdbcType="VARCHAR" />
+    <result column="C_CREATE_DATE" property="cCreateDate" jdbcType="DATE" />
+    <result column="C_NOTE" property="cNote" jdbcType="VARCHAR" />
+    <result column="C_NO" property="cNo" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    C_ID, C_NAME, C_CREATE_DATE, C_NOTE, C_NO
+  </sql>
+  <select id="selectByPage" resultMap="BaseResultMap" parameterType="rechal.apps.coll.model.ClazzModel" >
+    select
+    <include refid="Base_Column_List" />
+    from C_CLASS
+    where 1=1
+    <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(clazz.cName)" >
+    <bind name="pattern" value="'%'+clazz.cName+'%'"/>
+    AND  C_NAME LIKE #{pattern,jdbcType=VARCHAR} OR C_NO LIKE #{pattern,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CClass" useGeneratedKeys="true" keyProperty="cId"  keyColumn="C_ID">
+    insert into C_CLASS (C_NAME, C_CREATE_DATE, C_NOTE, C_NO)
+    values 
+    (#{cName,jdbcType=VARCHAR}, #{cCreateDate,jdbcType=DATE}, #{cNote,jdbcType=VARCHAR}, #{cNo,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  <select id="cacheClassKeyName" resultMap="BaseResultMap" >
+    select C_ID, C_NAME, C_CREATE_DATE, C_NOTE, C_NO
+    from C_CLASS
+  </select>
+</mapper>

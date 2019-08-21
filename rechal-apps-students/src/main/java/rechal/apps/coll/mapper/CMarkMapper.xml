@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.CMarkMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CMark" >
+    <id column="M_ID" property="mId" jdbcType="BIGINT" />
+    <result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+    <result column="C_ID" property="cId" jdbcType="BIGINT" />
+    <result column="M_DATE" property="mDate" jdbcType="DATE" />
+    <result column="S_NO" property="sNo" jdbcType="VARCHAR" />
+    <result column="S_NAME" property="sName" jdbcType="VARCHAR" />
+    <result column="M_NOTE" property="mNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    M_ID, M_NO, C_ID, M_DATE, S_NO, S_NAME, M_NOTE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CMarkExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_MARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_MARK
+    where M_ID = #{mId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from C_MARK
+    where M_ID = #{mId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="rechal.apps.coll.entity.CMarkExample" >
+    delete from C_MARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CMark" >
+    insert into C_MARK (M_ID, M_NO, C_ID, 
+      M_DATE, S_NO, S_NAME, M_NOTE
+      )
+    values (#{mId,jdbcType=BIGINT}, #{mNo,jdbcType=VARCHAR}, #{cId,jdbcType=BIGINT}, 
+      #{mDate,jdbcType=DATE}, #{sNo,jdbcType=VARCHAR}, #{sName,jdbcType=VARCHAR}, #{mNote,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="rechal.apps.coll.entity.CMark" >
+    insert into C_MARK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mId != null" >
+        M_ID,
+      </if>
+      <if test="mNo != null" >
+        M_NO,
+      </if>
+      <if test="cId != null" >
+        C_ID,
+      </if>
+      <if test="mDate != null" >
+        M_DATE,
+      </if>
+      <if test="sNo != null" >
+        S_NO,
+      </if>
+      <if test="sName != null" >
+        S_NAME,
+      </if>
+      <if test="mNote != null" >
+        M_NOTE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mId != null" >
+        #{mId,jdbcType=BIGINT},
+      </if>
+      <if test="mNo != null" >
+        #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cId != null" >
+        #{cId,jdbcType=BIGINT},
+      </if>
+      <if test="mDate != null" >
+        #{mDate,jdbcType=DATE},
+      </if>
+      <if test="sNo != null" >
+        #{sNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sName != null" >
+        #{sName,jdbcType=VARCHAR},
+      </if>
+      <if test="mNote != null" >
+        #{mNote,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="rechal.apps.coll.entity.CMarkExample" resultType="java.lang.Integer" >
+    select count(*) from C_MARK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update C_MARK
+    <set >
+      <if test="record.mId != null" >
+        M_ID = #{record.mId,jdbcType=BIGINT},
+      </if>
+      <if test="record.mNo != null" >
+        M_NO = #{record.mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cId != null" >
+        C_ID = #{record.cId,jdbcType=BIGINT},
+      </if>
+      <if test="record.mDate != null" >
+        M_DATE = #{record.mDate,jdbcType=DATE},
+      </if>
+      <if test="record.sNo != null" >
+        S_NO = #{record.sNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sName != null" >
+        S_NAME = #{record.sName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mNote != null" >
+        M_NOTE = #{record.mNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update C_MARK
+    set M_ID = #{record.mId,jdbcType=BIGINT},
+      M_NO = #{record.mNo,jdbcType=VARCHAR},
+      C_ID = #{record.cId,jdbcType=BIGINT},
+      M_DATE = #{record.mDate,jdbcType=DATE},
+      S_NO = #{record.sNo,jdbcType=VARCHAR},
+      S_NAME = #{record.sName,jdbcType=VARCHAR},
+      M_NOTE = #{record.mNote,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="rechal.apps.coll.entity.CMark" >
+    update C_MARK
+    <set >
+      <if test="mNo != null" >
+        M_NO = #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cId != null" >
+        C_ID = #{cId,jdbcType=BIGINT},
+      </if>
+      <if test="mDate != null" >
+        M_DATE = #{mDate,jdbcType=DATE},
+      </if>
+      <if test="sNo != null" >
+        S_NO = #{sNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sName != null" >
+        S_NAME = #{sName,jdbcType=VARCHAR},
+      </if>
+      <if test="mNote != null" >
+        M_NOTE = #{mNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where M_ID = #{mId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="rechal.apps.coll.entity.CMark" >
+    update C_MARK
+    set M_NO = #{mNo,jdbcType=VARCHAR},
+      C_ID = #{cId,jdbcType=BIGINT},
+      M_DATE = #{mDate,jdbcType=DATE},
+      S_NO = #{sNo,jdbcType=VARCHAR},
+      S_NAME = #{sName,jdbcType=VARCHAR},
+      M_NOTE = #{mNote,jdbcType=VARCHAR}
+    where M_ID = #{mId,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,545 @@
+		<div>
+		    <style>
+		    .btn_search{
+			    padding: 1px 4px;
+				line-height: 24px;
+				border-width: 2px;
+				font-size: 12px;
+				float: right;
+				width: 100%;
+		    }
+		    .full{
+		    	width: 100% !important;
+		    }
+		    label.error
+	        {
+	            color:Red;
+	            font-size:13px;
+	            margin-left:5px;
+	            padding-left:16px;
+	            background:url("/assets/users/img/error.png") left no-repeat;
+	        }
+	        .textarea_pub {
+				width: 100%;
+				height: 70px;
+			}
+		    </style>
+		    <script src="/assets/select2/js/i18n/zh-CN.js"></script>
+			<!-- condition start -->
+			<div class="row">
+				<form id="f_con" action="">
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+						<input id="mNo" name="marked.mNo" class="full" type="text" title="如:2019年下学期第三次考试6年级2019 T2 03 C60" placeholder="学期考试编号" />
+					</div>
+					
+					<div class="col-lg-1 col-sm-3 col-xs-6">
+				 		<button id="btn_filter" class="btn btn_search btn-purple" type="button">筛选</button>
+				 	</div>
+				 	<div class="col-lg-1 col-sm-3 col-xs-6">
+						<button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn_upload"><i class="layui-icon"></i>上传成绩</button>
+					</div>
+					<div class="col-lg-1 col-sm-3 col-xs-6">
+				 		<button id="btn_create" class="btn btn_search btn-purple" type="button">生成分数线</button>
+				 	</div>
+					<div class="col-lg-1 col-sm-3 col-xs-6">
+				 		<button id="btn_sta" class="btn btn_search btn-purple" type="button">统计上线人数</button>
+				 	</div>
+				</form>
+			<!-- condition end -->
+			</div>
+		</div>
+	
+		<!-- 数据table -->
+		<table id="tb_org" lay-filter="tb_org">
+		</table>
+		<div class="well well-sm">
+			<p>
+				<i class="fa fa-exclamation-circle red"></i>
+				学期考试编号规则,例:2019 T1 06 G60</p>
+			<p>
+				<i class="ace-icon fa fa-share green"></i>
+					2019:为2019年度; 
+					</p>
+			<p>
+				<i class="ace-icon fa fa-share green"></i>
+					T1:第一学期，第二学期为T2; 
+					</p>
+			<p>
+				<i class="ace-icon fa fa-share green"></i> 
+					06:第六次考试, 第二次考试(期中)为02; 
+					</p>
+			<p>
+				<i class="ace-icon fa fa-share green"></i> 
+					G6:6年级, 1年级为G1; 
+					</p>
+			<p>
+				<i class="ace-icon fa fa-share green"></i> 
+					末尾0: 表示 第几次统计,如按上线率30%默认为0,计算前100名时可改为1需要将成绩再导入一次</p>
+		</div>
+		<div class="vspace-12-sm"></div>
+		<!-- 数据table -->
+		<table id="tb_online" lay-filter="tb_online">
+		</table>
+		<DIV>
+		<p>
+				<i class="fa fa-exclamation-circle red"></i>
+				<span id="rmsg"/></p>
+		</DIV>
+
+
+<script src="/assets/users/js/term.js"></script>								
+<script src="/assets/users/js/jquery.format.js"></script>								
+<script th:inline="javascript">
+var validator;
+var clazz=[[(${clazz})]];
+
+//格式YYYY/MM/DD HH:mm:ss
+function dateFormat(v, fmt){
+	if(v==null||''===v) return '';
+	return moment(v).format(fmt);
+}
+
+function numberFmt(v,fmt) {
+	if(v) return $.format.number(v, fmt);
+	return '';
+}
+$(function(){
+	$('#mNo').val(termNo());
+	
+	if ($.validator) {
+        jQuery.validator.addMethod("selectRequired", function() {
+        	var emptys= $("#msRate").val()=="" && $("#msMarked").val()=="";
+        	var fulls= $("#msRate").val()!="" && $("#msMarked").val()!="";
+            return !(emptys||fulls);
+        }, "上线率与上线人数只能填写一个!");
+    }
+	/**
+	 * input的检验
+	 */
+	 validator=$("#f_org_edited").validate({
+		rules: {
+			msWeight: { required: true, number:true, max: 1, min:0},
+			msRate: { selectRequired: true , number:true, max: 1, min:0},
+			msMared: { selectRequired: true, digits:true }
+		},
+		//自定义错误提示信息
+		messages: {
+			msWeight:{
+				required:'必填'
+			}
+		}
+	});
+	 
+	
+	$('#mNo').val(termNo());
+	var colsR=[ //表头
+			      {field: 'G_NO', title: '年级', minWidth:40, align:'center'}
+			    ];
+	var columnsR=new Array();
+	$.extend(columnsR, colsR);
+	if(clazz){
+		$.each(clazz, function(i,e){
+			var col=new Object();
+			col.field=e.C_NO;
+			col.title=e.C_NAME;
+			col.minWidth=80;
+			col.align='center';
+			columnsR.push(col);
+		});
+	}
+	
+	
+	var cols=[ //表头
+		      {field: 'mNo', title: '学期编号', minWidth:80, align:'center'}
+		      ,{field: 'kNo', title: '学科编码', hide:true, align:'center'}
+		      ,{field: 'kName', title: '学科', minWidth:80, align:'center'}
+		      ,{field: 'msWeight', title: '学科权重', minWidth:40, align:'right'}
+		      ,{field: 'msRate', title: '上线率', minWidth:40, align:'right',templet:function(row){
+					return numberFmt(row.msRate * 100, '####.00') + '%';
+				}}
+		      ,{field: 'msAll', title: '总人数', minWidth:80, align:'right'}
+		      ,{field: 'msLine', title: '分数线', minWidth:80, align:'right',templet:function(row){
+					return numberFmt(row.msLine, '####.00');
+				}}
+		      ,{field: 'msMarked', title: '上线人数', minWidth:80, align:'right'}
+		      ,{field: '', title: '操作', toolbar: '#barDemo', align:'center'}
+		    ]
+	
+	var columns=new Array();
+	$.extend(columns, cols);
+	layui.use(['table', 'layer', 'upload'],function(){
+		var table=layui.table;
+		var layer=layui.layer;
+		var upload = layui.upload;
+		
+		table.render({
+		    elem: '#tb_online'
+		    ,method: 'post'
+		    ,url: '/sta/result/clist' //数据接口
+		    ,where: {
+				  "marked.mNo": function(){
+					    return $('#mNo').val();
+					  }
+					}
+		    ,cols: [ columnsR ]
+			,response: {
+			      statusCode: 0 //重新规定成功的状态码为 200，table 组件默认为 0
+		    }
+		    ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+		    	if(res.data&&res.data.userdata) {
+			    	$('#rmsg').html('分数顺序:'+res.data.userdata.COURSE_SEQ)
+		    	}
+		      return {
+		        "code": res.code, //解析接口状态
+		        "msg": res.msg, //解析提示文本
+		        "data": res.data.rows //解析数据列表
+		      };
+		    }
+		  });
+		
+		
+		table.render({
+		    elem: '#tb_org'
+		    ,method: 'post'
+		    ,url: '/sta/marked/list' //数据接口
+		    ,page: {    	//开启分页
+		    	limit: 10
+		    }
+		    ,where: {
+				  "marked.mNo": function(){
+					    return $('#mNo').val();
+					  }
+					}
+		    ,cols: [ columns ]
+			,response: {
+			      statusCode: 0 //重新规定成功的状态码为 200，table 组件默认为 0
+		    }
+		    ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+		    	
+		      return {
+		        "code": res.code, //解析接口状态
+		        "msg": res.msg, //解析提示文本
+		        "count": res.data.totalRows, //解析数据长度
+		        "data": res.data.rows //解析数据列表
+		      };
+		    }
+		  });
+	
+		  //监听工具条
+		  table.on('tool(tb_org)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'edit'){
+		    	edit(layer, obj);
+		    }
+		  });
+		
+		  $('#btn_filter').bind('click', function(e){
+			  var infos=$.serializeObject($('#f_con'));
+			  infos.create=false;
+			  table.reload('tb_org', {
+				  //设定异步数据接口的额外参数，任意设
+				  where: infos
+			   }); //只重载数据
+			   table.reload('tb_online', {
+					  //设定异步数据接口的额外参数，任意设
+					  where: infos
+				   }); //只重载数据
+		  });
+		  $('#btn_create').bind('click', function(e){
+			  var infos=$.serializeObject($('#f_con'));
+			  if(infos.hasOwnProperty('marked.mNo')){
+				  infos.create=true;
+				  table.reload('tb_org', {
+					  //设定异步数据接口的额外参数，任意设
+					  where: infos
+				   }); //只重载数据
+			  } else {
+				  layer.msg("请选择学期考试编码");
+			  }
+		  });
+		  $('#btn_sta').bind('click', function(e){
+			  var infos=$.serializeObject($('#f_con'));
+			  var lyeridx;
+			  if(infos.hasOwnProperty('marked.mNo')){
+				  infos.create=false;
+				  $.ajax({
+						url: '/sta/marked/clist',
+						type: 'post',
+						data: infos,
+						dataType: 'json',
+						async: false,
+						beforeSend: function(XHR){
+							lyeridx=layer.msg('正在生成数据，请稍候……', { icon: 16, shade:0.5, shadeClose:false, time:0 });
+						},
+						complete: function(XHR, TS){
+							layer.close(lyeridx);
+						},
+						success:function(response){
+							var infos=$.serializeObject($('#f_con'));
+							  infos.create=false;
+							   table.reload('tb_online', {
+									  where: infos
+								   }); //只重载数据
+						}
+					});
+			  } else {
+				  layer.msg("请选择学期考试编码");
+			  }
+		  });
+		  
+		  var loadingIndex;
+		  var uploadIndex;
+		  $('#btn_upload').bind('click', function(e){
+			  if(!mNoCheck()) return ;
+			  uploadIndex=layer.open({
+			        type: 1 //此处以iframe举例
+			        ,title: ''
+			        //,area: '800'
+			        ,shadeClose:false
+			        ,btn:['取消']
+			  		,btnAlign: 'c'
+			        ,content: $('#upload-plugin')
+			        ,move :'.page-header'
+			        ,yes: function(){
+			        	layer.close(uploadIndex);
+			        }
+			      });
+		  });
+		  
+		  
+		  //成绩上传
+		  var uploadInst = upload.render({
+			  elem: '#upload_score'
+			  ,url: '/sta/upload/score'
+			  ,size: 60 //限制文件大小，单位 KB
+			  ,accept: 'file'
+			  ,acceptMime: 'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+			  ,exts:'xlsx|xls'
+			  ,data: {
+					  termNo: function(){
+					    return $('#mNo').val();
+					  },
+					  reset: function(){
+					    return $('#uploadNewFile').is(':checked');
+					  }
+					}
+			  ,before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+				  loadingIndex=layer.msg('正在读取数据，请稍候……', { icon: 16, shade:0.5, shadeClose:false, time:0 });
+			  }
+			  ,done: function(res, index, upload){
+			      layer.alert(res.msg);
+			      layer.close(loadingIndex);
+			      layer.close(uploadIndex);
+			      if('0'===res.code){
+			    	  var infos=$.serializeObject($('#f_con'));
+			    	  table.reload('tb_org', {
+						  where: infos
+					   }); //只重载数据
+			      }
+			  }
+			  ,error: function(index, upload){
+				  layer.close(loadingIndex);
+			  }
+		  });
+		  
+		  $('#upload_template').bind('click', function(e){
+			  window.open('/sta/template');
+		  });
+	});
+	
+});
+
+function mNoCheck(){
+	var v=$('#mNo').val();
+	if(!v || v.length!=11) {
+		layui.use('layer', function(){
+			  var layer = layui.layer;
+			  layer.msg('学期考试编号不能为空(长度为11位)');
+			});
+		return;
+	}
+	var regstr=/^(\d{4}T[1-2]{1}[0-9]{2}G[1-9]{1}[0-9]{1})$/;
+	if(regstr.test(v)){
+		return v;
+	}
+	layui.use('layer', function(){
+		  var layer = layui.layer;
+		  layer.msg('编号格式错误,格式 2019 T1 02 G6 0');
+		});
+	return false;
+}
+
+/**
+ * 编辑用户信息
+ */
+function edit(layer, rObj){
+	var row=rObj.data;
+	if(!row) return;
+	if(validator) validator.resetForm();
+	$('#f_org_edited')[0].reset();
+	$('#org_add_id').css('display','none');
+	$('#msId').val(row.msId);
+	$('#msRate').val(row.msRate);
+	$('#msWeight').val(row.msWeight);
+	$('#msMarked').val(row.msMarked);
+	
+	var idx=layer.open({
+        type: 1 //此处以iframe举例
+        ,title: ''
+        ,area: '80%'
+        ,shadeClose:false
+        ,btn: ['保存', '取消'] //只是为了演示
+        ,btnAlign: 'c'
+        ,content: $('#org_editor')
+        ,move :'.page-header'
+        ,yes: function(index, layero){
+        	if(!$("#f_org_edited").valid()) {
+        		return;
+        	}
+        	var org=$.serializeObject($('#f_org_edited'));
+			org.mNo=row.mNo;
+        	if(saveOrg(org)){
+        		layui.use(['table'],function(){
+        			var table=layui.table;
+        			var infos=$.serializeObject($('#f_con'));
+      			    infos.create=false;
+	        		table.reload('tb_org', {
+						  //设定异步数据接口的额外参数，任意设
+						  where: infos
+					   }); //只重载数据
+        		});
+        		layer.close(idx);
+        	}
+        }
+        ,btn2: function(){
+          layer.close(idx);
+        }
+      });
+}
+/**
+ * 保存用户信息
+ */
+function saveOrg(org){
+	var flag=false;
+	$.ajax({
+		url: '/sta/marked/save',
+		type: 'post',
+		data: org,
+		dataType: 'json',
+		async: false,
+		success:function(response){
+			layui.use('layer', function(){
+			  var layer = layui.layer;
+			  layer.alert(response.msg);
+			});
+			if('0'==response.code) {
+				flag=true;
+			}
+		}
+	});
+	return flag;
+}
+
+</script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">设置</a>
+</script>
+
+<!-- 修改上线率 -->
+<div id="org_editor" class="page-content row" style="display:none;overflow-x:hidden;overflow-y:auto; ">
+	<!-- /section:settings.box -->
+	<div class="page-header">
+		<h1>
+			<p id="orgIdTxt">修改上线率</p>
+		</h1>
+	</div><!-- /.page-header -->
+
+	<div class="row">
+		<div class="col-xs-12">
+			<!-- PAGE CONTENT BEGINS -->
+			<form class="form-horizontal" role="form" id="f_org_edited">
+				<div id="org_add_id" class="form-group">
+			 		<label for="msId" class="col-sm-3 control-label no-padding-right">记录ID</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 from-inline">
+						<input type="text" id="msId" name="msId" class="full" placeholder="记录ID">
+					</div>
+			 	</div>
+			 	
+			 	<!-- #section:elements.form -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="msWeight">学科权重</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<input type="text" id="msWeight" name="msWeight" class="full" placeholder="上线率" />
+					</div>
+				</div>
+				
+				<div class="space-4" />
+			 	<!-- #section:elements.form -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="kNo">上线率</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<input type="text" id="msRate" name="msRate" class="full" placeholder="上线率" />
+					</div>
+				</div>
+				
+				<div class="space-4" />
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="msMarked">上线人数</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<input type="text" id="msMarked" name="msMarked" class="full" placeholder="上线率" />
+					</div>
+				</div>
+				
+				<div class="space-4" />
+			</form>
+		</div><!-- /.col -->
+	</div><!-- /.row -->
+</div><!-- /.page-content -->
+
+
+<div id="upload-plugin" class="page-content row" style="display:none;overflow-x:hidden;overflow-y:auto; ">
+	
+	<!-- /section:settings.box -->
+	<div class="page-header">
+		<h1>
+			<p id="orgIdTxt">上传成绩</p>
+		</h1>
+	</div><!-- /.page-header -->
+
+	<div class="row">
+		<div class="col-lg-6 col-sm-6 col-xs-12">
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="upload_score"><i class="layui-icon"></i>文件选择</button>
+		</div>
+		<div class="col-lg-6 col-sm-6 col-xs-12">
+			<label>
+				<input id="uploadNewFile" name="uploadNewFile" class="ace ace-switch" type="checkbox"/>
+				<span class="lbl" data-lbl="重传 &nbsp;&nbsp;&nbsp;&nbsp;上传"></span>
+			</label>
+		</div>
+		
+		<script>
+		$(function(){
+			
+		});
+		</script>
+	</div><!-- /.row -->
+	<div class="row" style="margin-top: 10px">
+		<div class="col-lg-6 col-sm-6 col-xs-12">
+			<button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="upload_template"><i class="layui-icon layui-icon-download-circle"></i>模板下载</button>
+		</div>
+	</div>
+	<div class="row" style="margin-top: 10px;padding-left:10px;">
+		<div class="well well-sm col-lg-12 col-sm-12 col-xs-12">
+			<p>
+				<i class="fa fa-exclamation-circle red"></i>
+				重新上传会删除原来的数据</p>
+			<p>
+				<i class="fa fa-exclamation-circle red"></i>
+				重新上传要求这次考试还未生分数线</p>
+		</div>
+	</div>
+</div><!-- /.page-content -->
+
+<!-- 设置select2 下拉框问题 -->
+<div id="w" style="position:absolute;z-index:19892018">
+</div>

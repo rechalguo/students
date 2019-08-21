@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+					    http://mybatis.org/schema/mybatis-spring 
+					    http://mybatis.org/schema/mybatis-spring.xsd"
+	default-lazy-init="false">
+	
+	<!-- 
+	构造函数-setter方法注入-initmethod-调用的方法-destroymethod
+	 -->
+	<bean id="h2Server" class="rechal.apps.coll.util.db.H2Server" init-method="start" destroy-method="close">
+		<property name="dir" value="${app.db.dir}" />
+		<property name="port" value="${app.db.port}" />
+	</bean>
+</beans>

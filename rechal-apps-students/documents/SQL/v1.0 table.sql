@@ -1,0 +1,68 @@
+-- 学生表
+CREATE TABLE C_STU (
+  S_NO VARCHAR(50) PRIMARY KEY NOT NULL, -- '学号',
+  S_NAME VARCHAR(100) NOT NULL , -- '姓名',
+  S_AGE TINYINT , -- '年龄',
+  S_SEX CHAR(1), -- '性别 'M', 'F', 'O'
+  S_BIRTH_DATE DATE , -- '出生年月',
+  S_INTAKE_DATE DATE , -- '入学时间',
+  S_OUTTAKE_DATE DATE , -- '毕业时间',
+  S_TEL VARCHAR(50) , -- '联系方式',
+  S_ADDR VARCHAR(225) NOT NULL , -- '住址',
+  S_CREATE_DATE DATE , -- '记录时间',
+  S_NOTE VARCHAR(225)  -- '其它备注'
+)
+-- 班级表
+CREATE TABLE C_CLASS (
+  C_ID IDENTITY PRIMARY KEY NOT NULL , -- 记录ID,
+  C_NO VARCHAR(20) NOT NULL, --班级编号
+  C_NAME VARCHAR(100) NOT NULL , -- '班级名称',
+  C_CREATE_DATE DATE , -- '记录时间',
+  C_NOTE VARCHAR(225)  -- '其它备注'
+);
+CREATE UNIQUE INDEX  IDX_CLZ_CNO ON C_CLASS(C_NO)
+
+--学科表
+CREATE TABLE C_COURSE (
+  K_ID IDENTITY PRIMARY KEY , -- '科目ID',
+  K_NO VARCHAR(20) NOT NULL, --学科编号,
+  K_NAME VARCHAR(100) NOT NULL , -- '科目名',
+  K_CREATE_DATE DATE , -- '创建时间',
+  K_NOTE VARCHAR(225)  -- '其它备注'
+)
+CREATE UNIQUE INDEX  IDX_CRS_KNO ON C_COURSE(K_NO)
+
+-- 成绩表
+CREATE TABLE C_MARK (
+  M_ID IDENTITY PRIMARY KEY , -- '记录ID',
+  M_NO VARCHAR(20) NOT NULL , -- '学期考试编号  如2018年第一学期第三次考试2018103，或2018第二学期第一次考试2018201',
+  C_ID BIGINT NOT NULL , -- '所属班级',
+  M_DATE DATE NOT NULL , -- '考试时间，不是成绩录入时间',
+  S_NO VARCHAR(50) NOT NULL , -- '学号',
+  S_NAME VARCHAR(100) NOT NULL , -- '姓名',
+  M_NOTE VARCHAR(225)  -- '其它备注'
+)
+CREATE INDEX  IDX_MK_MNO ON C_MARK(M_NO,C_ID)
+
+--上线统计表
+CREATE TABLE C_MARKED (
+  MS_ID IDENTITY PRIMARY KEY , -- '记录ID',
+  MS_CREATE_DATE DATE NOT NULL, -- 统计时间
+  M_NO VARCHAR(20) NOT NULL , -- '学期考试编号',
+  
+  K_NO VARCHAR(20) NOT NULL, --学科编号, 0 表示综合
+  MS_WEIGHT DOUBLE, --学科权重
+  MS_RATE DOUBLE, --上线率
+  MS_LINE DOUBLE, --分数线
+  MS_ALL INT, --人数
+  MS_MARKED INT, --上线人数
+  MS_NOTE VARCHAR(225)  -- '其它备注'
+)
+CREATE INDEX IDX_MKD_MNO ON C_MARKED(M_NO)
+
+--数据导入记录表
+CREATE TABLE C_TERMED (
+  T_ID IDENTITY PRIMARY KEY , -- '记录ID',
+  M_NO VARCHAR(20) NOT NULL , -- '学期考试编号',
+  T_STAT CHAR(1) --0未导入 1成功导入  2已生成
+)

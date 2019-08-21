@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.CClassMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CClass" >
+    <id column="C_ID" property="cId" jdbcType="BIGINT" />
+    <result column="C_NAME" property="cName" jdbcType="VARCHAR" />
+    <result column="C_CREATE_DATE" property="cCreateDate" jdbcType="DATE" />
+    <result column="C_NOTE" property="cNote" jdbcType="VARCHAR" />
+    <result column="C_NO" property="cNo" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    C_ID, C_NAME, C_CREATE_DATE, C_NOTE, C_NO
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CClassExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_CLASS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_CLASS
+    where C_ID = #{cId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from C_CLASS
+    where C_ID = #{cId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="rechal.apps.coll.entity.CClassExample" >
+    delete from C_CLASS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CClass" >
+    insert into C_CLASS (C_ID, C_NAME, C_CREATE_DATE, 
+      C_NOTE, C_NO)
+    values (#{cId,jdbcType=BIGINT}, #{cName,jdbcType=VARCHAR}, #{cCreateDate,jdbcType=DATE}, 
+      #{cNote,jdbcType=VARCHAR}, #{cNo,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="rechal.apps.coll.entity.CClass" >
+    insert into C_CLASS
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cId != null" >
+        C_ID,
+      </if>
+      <if test="cName != null" >
+        C_NAME,
+      </if>
+      <if test="cCreateDate != null" >
+        C_CREATE_DATE,
+      </if>
+      <if test="cNote != null" >
+        C_NOTE,
+      </if>
+      <if test="cNo != null" >
+        C_NO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cId != null" >
+        #{cId,jdbcType=BIGINT},
+      </if>
+      <if test="cName != null" >
+        #{cName,jdbcType=VARCHAR},
+      </if>
+      <if test="cCreateDate != null" >
+        #{cCreateDate,jdbcType=DATE},
+      </if>
+      <if test="cNote != null" >
+        #{cNote,jdbcType=VARCHAR},
+      </if>
+      <if test="cNo != null" >
+        #{cNo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="rechal.apps.coll.entity.CClassExample" resultType="java.lang.Integer" >
+    select count(*) from C_CLASS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update C_CLASS
+    <set >
+      <if test="record.cId != null" >
+        C_ID = #{record.cId,jdbcType=BIGINT},
+      </if>
+      <if test="record.cName != null" >
+        C_NAME = #{record.cName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cCreateDate != null" >
+        C_CREATE_DATE = #{record.cCreateDate,jdbcType=DATE},
+      </if>
+      <if test="record.cNote != null" >
+        C_NOTE = #{record.cNote,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cNo != null" >
+        C_NO = #{record.cNo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update C_CLASS
+    set C_ID = #{record.cId,jdbcType=BIGINT},
+      C_NAME = #{record.cName,jdbcType=VARCHAR},
+      C_CREATE_DATE = #{record.cCreateDate,jdbcType=DATE},
+      C_NOTE = #{record.cNote,jdbcType=VARCHAR},
+      C_NO = #{record.cNo,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="rechal.apps.coll.entity.CClass" >
+    update C_CLASS
+    <set >
+      <if test="cName != null" >
+        C_NAME = #{cName,jdbcType=VARCHAR},
+      </if>
+      <if test="cCreateDate != null" >
+        C_CREATE_DATE = #{cCreateDate,jdbcType=DATE},
+      </if>
+      <if test="cNote != null" >
+        C_NOTE = #{cNote,jdbcType=VARCHAR},
+      </if>
+      <if test="cNo != null" >
+        C_NO = #{cNo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where C_ID = #{cId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="rechal.apps.coll.entity.CClass" >
+    update C_CLASS
+    set C_NAME = #{cName,jdbcType=VARCHAR},
+      C_CREATE_DATE = #{cCreateDate,jdbcType=DATE},
+      C_NOTE = #{cNote,jdbcType=VARCHAR},
+      C_NO = #{cNo,jdbcType=VARCHAR}
+    where C_ID = #{cId,jdbcType=BIGINT}
+  </update>
+</mapper>

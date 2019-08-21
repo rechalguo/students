@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.MarkedMapperExt">
+	<resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CMarkedExt">
+		<id column="MS_ID" property="msId" jdbcType="BIGINT" />
+		<result column="MS_CREATE_DATE" property="msCreateDate"
+			jdbcType="DATE" />
+		<result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+		<result column="K_NO" property="kNo" jdbcType="VARCHAR" />
+		<result column="K_NAME" property="kName" jdbcType="VARCHAR" />
+		<result column="MS_WEIGHT" property="msWeight" jdbcType="DOUBLE" />
+		<result column="MS_RATE" property="msRate" jdbcType="DOUBLE" />
+		<result column="MS_LINE" property="msLine" jdbcType="INTEGER" />
+		<result column="MS_ALL" property="msAll" jdbcType="INTEGER" />
+		<result column="MS_MARKED" property="msMarked" jdbcType="INTEGER" />
+		<result column="MS_NOTE" property="msNote" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		MS_ID, MS_CREATE_DATE, M_NO, K_NO,MS_WEIGHT, MS_RATE, MS_LINE, MS_ALL, MS_MARKED,
+		MS_NOTE
+	</sql>
+	<select id="selectByPage" resultMap="BaseResultMap"
+		parameterType="rechal.apps.coll.model.MarkedModel">
+		select MS_ID,
+		MS_CREATE_DATE,
+		M_NO,
+		M.K_NO,
+		DECODE(C.K_NAME, NULL,'综合',C.K_NAME) K_NAME,
+		MS_WEIGHT,
+		MS_RATE,
+		MS_ALL,
+		MS_LINE,
+		MS_MARKED
+		FROM C_MARKED M LEFT JOIN C_COURSE C
+		ON M.K_NO = C.K_NO
+		WHERE 1=1
+		<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(marked.mNo)">
+			AND M.M_NO = #{marked.mNo,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<insert id="inserts" parameterType="java.util.ArrayList"
+		useGeneratedKeys="true" keyProperty="msId" keyColumn="MS_ID">
+		insert into C_MARKED (MS_CREATE_DATE, M_NO,
+		K_NO, MS_RATE, MS_LINE,
+		MS_ALL, MS_MARKED, MS_NOTE
+		)
+		values
+		<foreach collection="list" item="m" index="index" separator=",">
+			(#{m.msCreateDate,jdbcType=DATE}, #{m.mNo,jdbcType=VARCHAR},
+			#{m.kNo,jdbcType=VARCHAR}, #{m.msRate,jdbcType=DOUBLE},
+			#{m.msLine,jdbcType=INTEGER},
+			#{m.msAll,jdbcType=INTEGER}, #{m.msMarked,jdbcType=INTEGER}, #{m.msNote,jdbcType=VARCHAR}
+			)
+		</foreach>
+	</insert>
+
+	<!-- 计算分数线 -->
+	<select id="selectMarkLine" resultType="java.util.HashMap"
+		parameterType="rechal.apps.coll.model.MarkedModel">
+		SELECT ZH MARKLINE, NID MARKED FROM (
+			SELECT
+			<choose>
+				<when test="@org.apache.commons.lang3.StringUtils@isNotBlank(coll)">
+					${coll} ZH,
+					RANK() OVER (ORDER BY ${coll} DESC) R_ID,
+					ROW_NUMBER() OVER (ORDER BY ${coll} DESC) NID
+				</when>
+				<otherwise>
+					(IFNULL(M.M_YUMEN,0)+IFNULL(M.M_SHUXUE,0)+IFNULL(M.M_ENLIGSH,0)) ZH,
+					RANK() OVER (ORDER BY
+					(IFNULL(M.M_YUMEN,0)+IFNULL(M.M_SHUXUE,0)+IFNULL(M.M_ENLIGSH,0))
+					DESC) R_ID,
+					ROW_NUMBER() OVER (ORDER BY
+					(IFNULL(M.M_YUMEN,0)+IFNULL(M.M_SHUXUE,0)+IFNULL(M.M_ENLIGSH,0))
+					DESC) NID
+				</otherwise>
+			</choose>
+			FROM C_MARK M
+			WHERE M.M_NO = #{marked.mNo,jdbcType=VARCHAR}
+			ORDER BY R_ID DESC
+		<![CDATA[
+		) F WHERE R_ID <= #{marked.msMarked,jdbcType=INTEGER}
+		]]>
+		ORDER BY NID DESC
+		LIMIT 1
+	</select>
+	
+	
+	<!-- 计算上线人数 -->
+	<select id="selectMarkdByClass" resultMap="BaseResultMap"
+		parameterType="rechal.apps.coll.model.MarkedModel">
+	SELECT M.M_NO, C.C_NO K_NO, C.C_NAME K_NAME, COUNT(1) MS_MARKED
+	 FROM C_MARK M LEFT JOIN C_CLASS C
+	      ON M.C_ID=C.C_ID
+	WHERE M.M_NO=#{marked.mNo,jdbcType=VARCHAR}
+	  <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(course)">
+	  AND EXISTS (SELECT 1 
+	  				FROM C_MARKED MD 
+	  			   WHERE MD.M_NO=#{marked.mNo,jdbcType=VARCHAR} 
+	  			     AND UPPER(MD.K_NO)=UPPER(#{course,jdbcType=VARCHAR}) 
+	  			     <![CDATA[AND MD.MS_LINE <=  M.M_${course}]]>)
+	  </if>
+	  AND EXISTS (SELECT 1 
+	                FROM C_MARKED MD 
+	               WHERE MD.M_NO=#{marked.mNo,jdbcType=VARCHAR} 
+	                 AND UPPER(MD.K_NO)=UPPER('ALL') 
+	                 <![CDATA[AND MD.MS_LINE <= ${coll}]]> )
+	GROUP BY M.M_NO, C.C_NO, C.C_NAME
+	</select>
+
+</mapper>

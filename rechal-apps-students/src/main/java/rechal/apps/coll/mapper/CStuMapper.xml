@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.CStuMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CStu" >
+    <id column="S_NO" property="sNo" jdbcType="VARCHAR" />
+    <result column="S_NAME" property="sName" jdbcType="VARCHAR" />
+    <result column="S_AGE" property="sAge" jdbcType="TINYINT" />
+    <result column="S_SEX" property="sSex" jdbcType="CHAR" />
+    <result column="S_BIRTH_DATE" property="sBirthDate" jdbcType="DATE" />
+    <result column="S_INTAKE_DATE" property="sIntakeDate" jdbcType="DATE" />
+    <result column="S_OUTTAKE_DATE" property="sOuttakeDate" jdbcType="DATE" />
+    <result column="S_TEL" property="sTel" jdbcType="VARCHAR" />
+    <result column="S_ADDR" property="sAddr" jdbcType="VARCHAR" />
+    <result column="S_CREATE_DATE" property="sCreateDate" jdbcType="DATE" />
+    <result column="S_NOTE" property="sNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    S_NO, S_NAME, S_AGE, S_SEX, S_BIRTH_DATE, S_INTAKE_DATE, S_OUTTAKE_DATE, S_TEL, S_ADDR, 
+    S_CREATE_DATE, S_NOTE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CStuExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_STU
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_STU
+    where S_NO = #{sNo,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from C_STU
+    where S_NO = #{sNo,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="rechal.apps.coll.entity.CStuExample" >
+    delete from C_STU
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CStu" >
+    insert into C_STU (S_NO, S_NAME, S_AGE, 
+      S_SEX, S_BIRTH_DATE, S_INTAKE_DATE, 
+      S_OUTTAKE_DATE, S_TEL, S_ADDR, 
+      S_CREATE_DATE, S_NOTE)
+    values (#{sNo,jdbcType=VARCHAR}, #{sName,jdbcType=VARCHAR}, #{sAge,jdbcType=TINYINT}, 
+      #{sSex,jdbcType=CHAR}, #{sBirthDate,jdbcType=DATE}, #{sIntakeDate,jdbcType=DATE}, 
+      #{sOuttakeDate,jdbcType=DATE}, #{sTel,jdbcType=VARCHAR}, #{sAddr,jdbcType=VARCHAR}, 
+      #{sCreateDate,jdbcType=DATE}, #{sNote,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="rechal.apps.coll.entity.CStu" >
+    insert into C_STU
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sNo != null" >
+        S_NO,
+      </if>
+      <if test="sName != null" >
+        S_NAME,
+      </if>
+      <if test="sAge != null" >
+        S_AGE,
+      </if>
+      <if test="sSex != null" >
+        S_SEX,
+      </if>
+      <if test="sBirthDate != null" >
+        S_BIRTH_DATE,
+      </if>
+      <if test="sIntakeDate != null" >
+        S_INTAKE_DATE,
+      </if>
+      <if test="sOuttakeDate != null" >
+        S_OUTTAKE_DATE,
+      </if>
+      <if test="sTel != null" >
+        S_TEL,
+      </if>
+      <if test="sAddr != null" >
+        S_ADDR,
+      </if>
+      <if test="sCreateDate != null" >
+        S_CREATE_DATE,
+      </if>
+      <if test="sNote != null" >
+        S_NOTE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sNo != null" >
+        #{sNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sName != null" >
+        #{sName,jdbcType=VARCHAR},
+      </if>
+      <if test="sAge != null" >
+        #{sAge,jdbcType=TINYINT},
+      </if>
+      <if test="sSex != null" >
+        #{sSex,jdbcType=CHAR},
+      </if>
+      <if test="sBirthDate != null" >
+        #{sBirthDate,jdbcType=DATE},
+      </if>
+      <if test="sIntakeDate != null" >
+        #{sIntakeDate,jdbcType=DATE},
+      </if>
+      <if test="sOuttakeDate != null" >
+        #{sOuttakeDate,jdbcType=DATE},
+      </if>
+      <if test="sTel != null" >
+        #{sTel,jdbcType=VARCHAR},
+      </if>
+      <if test="sAddr != null" >
+        #{sAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="sCreateDate != null" >
+        #{sCreateDate,jdbcType=DATE},
+      </if>
+      <if test="sNote != null" >
+        #{sNote,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="rechal.apps.coll.entity.CStuExample" resultType="java.lang.Integer" >
+    select count(*) from C_STU
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update C_STU
+    <set >
+      <if test="record.sNo != null" >
+        S_NO = #{record.sNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sName != null" >
+        S_NAME = #{record.sName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sAge != null" >
+        S_AGE = #{record.sAge,jdbcType=TINYINT},
+      </if>
+      <if test="record.sSex != null" >
+        S_SEX = #{record.sSex,jdbcType=CHAR},
+      </if>
+      <if test="record.sBirthDate != null" >
+        S_BIRTH_DATE = #{record.sBirthDate,jdbcType=DATE},
+      </if>
+      <if test="record.sIntakeDate != null" >
+        S_INTAKE_DATE = #{record.sIntakeDate,jdbcType=DATE},
+      </if>
+      <if test="record.sOuttakeDate != null" >
+        S_OUTTAKE_DATE = #{record.sOuttakeDate,jdbcType=DATE},
+      </if>
+      <if test="record.sTel != null" >
+        S_TEL = #{record.sTel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sAddr != null" >
+        S_ADDR = #{record.sAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sCreateDate != null" >
+        S_CREATE_DATE = #{record.sCreateDate,jdbcType=DATE},
+      </if>
+      <if test="record.sNote != null" >
+        S_NOTE = #{record.sNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update C_STU
+    set S_NO = #{record.sNo,jdbcType=VARCHAR},
+      S_NAME = #{record.sName,jdbcType=VARCHAR},
+      S_AGE = #{record.sAge,jdbcType=TINYINT},
+      S_SEX = #{record.sSex,jdbcType=CHAR},
+      S_BIRTH_DATE = #{record.sBirthDate,jdbcType=DATE},
+      S_INTAKE_DATE = #{record.sIntakeDate,jdbcType=DATE},
+      S_OUTTAKE_DATE = #{record.sOuttakeDate,jdbcType=DATE},
+      S_TEL = #{record.sTel,jdbcType=VARCHAR},
+      S_ADDR = #{record.sAddr,jdbcType=VARCHAR},
+      S_CREATE_DATE = #{record.sCreateDate,jdbcType=DATE},
+      S_NOTE = #{record.sNote,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="rechal.apps.coll.entity.CStu" >
+    update C_STU
+    <set >
+      <if test="sName != null" >
+        S_NAME = #{sName,jdbcType=VARCHAR},
+      </if>
+      <if test="sAge != null" >
+        S_AGE = #{sAge,jdbcType=TINYINT},
+      </if>
+      <if test="sSex != null" >
+        S_SEX = #{sSex,jdbcType=CHAR},
+      </if>
+      <if test="sBirthDate != null" >
+        S_BIRTH_DATE = #{sBirthDate,jdbcType=DATE},
+      </if>
+      <if test="sIntakeDate != null" >
+        S_INTAKE_DATE = #{sIntakeDate,jdbcType=DATE},
+      </if>
+      <if test="sOuttakeDate != null" >
+        S_OUTTAKE_DATE = #{sOuttakeDate,jdbcType=DATE},
+      </if>
+      <if test="sTel != null" >
+        S_TEL = #{sTel,jdbcType=VARCHAR},
+      </if>
+      <if test="sAddr != null" >
+        S_ADDR = #{sAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="sCreateDate != null" >
+        S_CREATE_DATE = #{sCreateDate,jdbcType=DATE},
+      </if>
+      <if test="sNote != null" >
+        S_NOTE = #{sNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where S_NO = #{sNo,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="rechal.apps.coll.entity.CStu" >
+    update C_STU
+    set S_NAME = #{sName,jdbcType=VARCHAR},
+      S_AGE = #{sAge,jdbcType=TINYINT},
+      S_SEX = #{sSex,jdbcType=CHAR},
+      S_BIRTH_DATE = #{sBirthDate,jdbcType=DATE},
+      S_INTAKE_DATE = #{sIntakeDate,jdbcType=DATE},
+      S_OUTTAKE_DATE = #{sOuttakeDate,jdbcType=DATE},
+      S_TEL = #{sTel,jdbcType=VARCHAR},
+      S_ADDR = #{sAddr,jdbcType=VARCHAR},
+      S_CREATE_DATE = #{sCreateDate,jdbcType=DATE},
+      S_NOTE = #{sNote,jdbcType=VARCHAR}
+    where S_NO = #{sNo,jdbcType=VARCHAR}
+  </update>
+</mapper>

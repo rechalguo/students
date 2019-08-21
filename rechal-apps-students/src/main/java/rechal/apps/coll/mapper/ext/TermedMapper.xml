@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.TermedMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CTermed" >
+    <id column="T_ID" property="tId" jdbcType="BIGINT" />
+    <result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+    <result column="T_STAT" property="tStat" jdbcType="CHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    T_ID, M_NO, T_STAT
+  </sql>
+  
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CTermed" useGeneratedKeys="true" keyProperty="tId"  keyColumn="T_ID">
+    insert into C_TERMED (M_NO, T_STAT)
+    values (#{mNo,jdbcType=VARCHAR}, #{tStat,jdbcType=CHAR})
+  </insert>
+
+</mapper>

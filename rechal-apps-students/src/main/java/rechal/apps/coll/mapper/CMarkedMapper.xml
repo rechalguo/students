@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.CMarkedMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CMarked" >
+    <id column="MS_ID" property="msId" jdbcType="BIGINT" />
+    <result column="MS_CREATE_DATE" property="msCreateDate" jdbcType="DATE" />
+    <result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+    <result column="K_NO" property="kNo" jdbcType="VARCHAR" />
+    <result column="MS_WEIGHT" property="msWeight" jdbcType="DOUBLE" />
+    <result column="MS_RATE" property="msRate" jdbcType="DOUBLE" />
+    <result column="MS_LINE" property="msLine" jdbcType="DOUBLE" />
+    <result column="MS_ALL" property="msAll" jdbcType="INTEGER" />
+    <result column="MS_MARKED" property="msMarked" jdbcType="INTEGER" />
+    <result column="MS_NOTE" property="msNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    MS_ID, MS_CREATE_DATE, M_NO, K_NO, MS_WEIGHT, MS_RATE, MS_LINE, MS_ALL, MS_MARKED, 
+    MS_NOTE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CMarkedExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_MARKED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_MARKED
+    where MS_ID = #{msId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from C_MARKED
+    where MS_ID = #{msId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="rechal.apps.coll.entity.CMarkedExample" >
+    delete from C_MARKED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CMarked" >
+    insert into C_MARKED (MS_ID, MS_CREATE_DATE, M_NO, 
+      K_NO, MS_WEIGHT, MS_RATE, 
+      MS_LINE, MS_ALL, MS_MARKED, 
+      MS_NOTE)
+    values (#{msId,jdbcType=BIGINT}, #{msCreateDate,jdbcType=DATE}, #{mNo,jdbcType=VARCHAR}, 
+      #{kNo,jdbcType=VARCHAR}, #{msWeight,jdbcType=DOUBLE}, #{msRate,jdbcType=DOUBLE}, 
+      #{msLine,jdbcType=DOUBLE}, #{msAll,jdbcType=INTEGER}, #{msMarked,jdbcType=INTEGER}, 
+      #{msNote,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="rechal.apps.coll.entity.CMarked" >
+    insert into C_MARKED
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="msId != null" >
+        MS_ID,
+      </if>
+      <if test="msCreateDate != null" >
+        MS_CREATE_DATE,
+      </if>
+      <if test="mNo != null" >
+        M_NO,
+      </if>
+      <if test="kNo != null" >
+        K_NO,
+      </if>
+      <if test="msWeight != null" >
+        MS_WEIGHT,
+      </if>
+      <if test="msRate != null" >
+        MS_RATE,
+      </if>
+      <if test="msLine != null" >
+        MS_LINE,
+      </if>
+      <if test="msAll != null" >
+        MS_ALL,
+      </if>
+      <if test="msMarked != null" >
+        MS_MARKED,
+      </if>
+      <if test="msNote != null" >
+        MS_NOTE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="msId != null" >
+        #{msId,jdbcType=BIGINT},
+      </if>
+      <if test="msCreateDate != null" >
+        #{msCreateDate,jdbcType=DATE},
+      </if>
+      <if test="mNo != null" >
+        #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="kNo != null" >
+        #{kNo,jdbcType=VARCHAR},
+      </if>
+      <if test="msWeight != null" >
+        #{msWeight,jdbcType=DOUBLE},
+      </if>
+      <if test="msRate != null" >
+        #{msRate,jdbcType=DOUBLE},
+      </if>
+      <if test="msLine != null" >
+        #{msLine,jdbcType=DOUBLE},
+      </if>
+      <if test="msAll != null" >
+        #{msAll,jdbcType=INTEGER},
+      </if>
+      <if test="msMarked != null" >
+        #{msMarked,jdbcType=INTEGER},
+      </if>
+      <if test="msNote != null" >
+        #{msNote,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="rechal.apps.coll.entity.CMarkedExample" resultType="java.lang.Integer" >
+    select count(*) from C_MARKED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update C_MARKED
+    <set >
+      <if test="record.msId != null" >
+        MS_ID = #{record.msId,jdbcType=BIGINT},
+      </if>
+      <if test="record.msCreateDate != null" >
+        MS_CREATE_DATE = #{record.msCreateDate,jdbcType=DATE},
+      </if>
+      <if test="record.mNo != null" >
+        M_NO = #{record.mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.kNo != null" >
+        K_NO = #{record.kNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.msWeight != null" >
+        MS_WEIGHT = #{record.msWeight,jdbcType=DOUBLE},
+      </if>
+      <if test="record.msRate != null" >
+        MS_RATE = #{record.msRate,jdbcType=DOUBLE},
+      </if>
+      <if test="record.msLine != null" >
+        MS_LINE = #{record.msLine,jdbcType=DOUBLE},
+      </if>
+      <if test="record.msAll != null" >
+        MS_ALL = #{record.msAll,jdbcType=INTEGER},
+      </if>
+      <if test="record.msMarked != null" >
+        MS_MARKED = #{record.msMarked,jdbcType=INTEGER},
+      </if>
+      <if test="record.msNote != null" >
+        MS_NOTE = #{record.msNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update C_MARKED
+    set MS_ID = #{record.msId,jdbcType=BIGINT},
+      MS_CREATE_DATE = #{record.msCreateDate,jdbcType=DATE},
+      M_NO = #{record.mNo,jdbcType=VARCHAR},
+      K_NO = #{record.kNo,jdbcType=VARCHAR},
+      MS_WEIGHT = #{record.msWeight,jdbcType=DOUBLE},
+      MS_RATE = #{record.msRate,jdbcType=DOUBLE},
+      MS_LINE = #{record.msLine,jdbcType=DOUBLE},
+      MS_ALL = #{record.msAll,jdbcType=INTEGER},
+      MS_MARKED = #{record.msMarked,jdbcType=INTEGER},
+      MS_NOTE = #{record.msNote,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="rechal.apps.coll.entity.CMarked" >
+    update C_MARKED
+    <set >
+      <if test="msCreateDate != null" >
+        MS_CREATE_DATE = #{msCreateDate,jdbcType=DATE},
+      </if>
+      <if test="mNo != null" >
+        M_NO = #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="kNo != null" >
+        K_NO = #{kNo,jdbcType=VARCHAR},
+      </if>
+      <if test="msWeight != null" >
+        MS_WEIGHT = #{msWeight,jdbcType=DOUBLE},
+      </if>
+      <if test="msRate != null" >
+        MS_RATE = #{msRate,jdbcType=DOUBLE},
+      </if>
+      <if test="msLine != null" >
+        MS_LINE = #{msLine,jdbcType=DOUBLE},
+      </if>
+      <if test="msAll != null" >
+        MS_ALL = #{msAll,jdbcType=INTEGER},
+      </if>
+      <if test="msMarked != null" >
+        MS_MARKED = #{msMarked,jdbcType=INTEGER},
+      </if>
+      <if test="msNote != null" >
+        MS_NOTE = #{msNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where MS_ID = #{msId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="rechal.apps.coll.entity.CMarked" >
+    update C_MARKED
+    set MS_CREATE_DATE = #{msCreateDate,jdbcType=DATE},
+      M_NO = #{mNo,jdbcType=VARCHAR},
+      K_NO = #{kNo,jdbcType=VARCHAR},
+      MS_WEIGHT = #{msWeight,jdbcType=DOUBLE},
+      MS_RATE = #{msRate,jdbcType=DOUBLE},
+      MS_LINE = #{msLine,jdbcType=DOUBLE},
+      MS_ALL = #{msAll,jdbcType=INTEGER},
+      MS_MARKED = #{msMarked,jdbcType=INTEGER},
+      MS_NOTE = #{msNote,jdbcType=VARCHAR}
+    where MS_ID = #{msId,jdbcType=BIGINT}
+  </update>
+</mapper>

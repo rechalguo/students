@@ -1,0 +1,381 @@
+		<div>
+		    <style>
+		    .btn_search{
+			    padding: 0 4px;
+				line-height: 23px;
+				border-width: 2px;
+				font-size: 12px;
+				float: right;
+				width: 40%;
+		    }
+		    .full{
+		    	width: 100% !important;
+		    }
+		    label.error
+	        {
+	            color:Red;
+	            font-size:13px;
+	            margin-left:5px;
+	            padding-left:16px;
+	            background:url("/assets/users/img/error.png") left no-repeat;
+	        }
+	        .textarea_pub {
+				width: 100%;
+				height: 70px;
+			}
+		    </style>
+			<!-- condition start -->
+			<div class="row">
+				<form id="f_con" action="">
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+						<input name="clazz.cName" class="full" type="text" placeholder="班级名" />
+					</div>
+					
+					<div class="col-lg-2 col-sm-6 col-xs-12 center">
+				 		<button id="btn_filter" class="btn btn_search btn-purple" type="button">筛选</button>
+				 	</div>
+				</form>
+			<!-- condition end -->
+			</div>
+		</div>
+	
+		<!-- 数据table -->
+		<table id="tb_org" lay-filter="tb_org">
+		</table>
+		<div class="vspace-12-sm"></div>
+
+
+
+								
+<script th:inline="none">
+var validator;
+
+
+//格式YYYY/MM/DD HH:mm:ss
+function dateFormat(v, fmt){
+	return moment(v).format(fmt);
+}
+
+//格式YYYY/MM/DD HH:mm:ss
+function activeFormat(v){
+	if(0===v)
+		return '禁用';
+	if(1===v)
+		return '可用';
+	return '未知';
+}
+
+/**
+ * 添加机构
+ */
+function add(layer){
+	if(validator) validator.resetForm();
+	$('#f_org_edited')[0].reset();
+	$('#org_add_id').css('display','none');
+	$('#orgIdTxt').html('添加班级');
+	$('#cCreateDate').datepicker("update",new Date());
+	$('#cNote').html("");
+	
+	var idx=layer.open({
+        type: 1 //此处以iframe举例
+        ,title: ''
+        ,area: '80%'
+        ,shadeClose:false
+        ,btn: ['保存', '取消'] //只是为了演示
+        ,btnAlign: 'c'
+        ,content: $('#org_editor')
+        ,move :'.page-header'
+        ,yes: function(index, layero){
+        	if(!$("#f_org_edited").valid()) {
+        		return;
+        	}
+        	var org=$.serializeObject($('#f_org_edited'));
+        	org.cNote=$('#cNote').val();
+        	if(saveOrg(org, true)){
+        		layer.close(idx);
+        		layui.use(['table'],function(){
+        			var table=layui.table;
+        			table.reload('tb_org');
+        		})
+        	}
+        }
+        ,btn2: function(){
+          layer.close(idx);
+        }
+      });
+}
+
+/**
+ * 编辑用户信息
+ */
+function edit(layer, rObj){
+	var row=rObj.data;
+	if(!row) return;
+	if(validator) validator.resetForm();
+	$('#f_org_edited')[0].reset();
+	$('#org_add_id').css('display','none');
+	$('#cId').val(row.cId);
+	$('#cNo').val(row.cNo);
+	$('#cName').val(row.cName);
+	$('#cCreateDate').datepicker("update",new Date(row.cCreateDate));
+	$('#cNote').html(row.cNote);
+	
+	var idx=layer.open({
+        type: 1 //此处以iframe举例
+        ,title: ''
+        ,area: '80%'
+        ,shadeClose:false
+        ,btn: ['保存', '取消'] //只是为了演示
+        ,btnAlign: 'c'
+        ,content: $('#org_editor')
+        ,move :'.page-header'
+        ,yes: function(index, layero){
+        	if(!$("#f_org_edited").valid()) {
+        		return;
+        	}
+        	var org=$.serializeObject($('#f_org_edited'));
+        	org=diffObj(row, org);
+			org.cId=row.cId;
+			if(Object.keys(org).length<=1){
+				layer.alert("年级信息未发生变化");
+				return;
+			}
+        	if(saveOrg(org,false)){
+       			rObj.update(org);
+        		layer.close(idx);
+        	}
+        }
+        ,btn2: function(){
+          layer.close(idx);
+        }
+      });
+}
+
+/**
+ * 保存用户信息
+ */
+function saveOrg(org,newer){
+	var flag=false;
+	var url='/coll/clazz/save';
+	if(newer) url='/coll/clazz/add';
+	$.ajax({
+		url: url,
+		type: 'post',
+		data: org,
+		dataType: 'json',
+		async: false,
+		success:function(response){
+			layui.use('layer', function(){
+			  var layer = layui.layer;
+			  layer.alert(response.msg);
+			});
+			if('0'==response.code) {
+				flag=true;
+			}
+		}
+	});
+	return flag;
+}
+
+$(function(){
+	if ($.validator) {
+        jQuery.validator.addMethod("clzRequired", function() {
+        	var rstr=/\d-\d/;
+        	var emptys=$("#cNo").val();
+        	if(rstr.test(emptys)) {
+        		return true;
+        	}
+            return false;
+        }, "请按格式  '数字-数字' 填写");
+    }
+	/**
+	 * input的检验
+	 */
+	 validator=$("#f_org_edited").validate({
+		rules: {
+			cNo: { clzRequired: true,
+				remote:{
+					url: '/base/exists/clazz',
+					type: 'get',
+					data: {
+						"clazz.cNo": function () { return $("#cNo").val(); },
+                    },
+					dataFilter:function(response){
+						var r=false;
+						if('false'===response) {
+							r=true; //true表示填写信息有误
+						}
+						return r;
+					}
+				}
+			},
+			cName: { required: true },
+			cCreateDate: { required: true, date:true }
+		},
+		//自定义错误提示信息
+		messages: {
+			cNo:{
+				remote:'班级编号已存在'
+			}
+		}
+	});
+	
+	
+	
+	layui.use(['table', 'layer'],function(){
+		var table=layui.table;
+		var layer=layui.layer;
+		
+		table.render({
+		    elem: '#tb_org'
+		    ,method: 'post'
+		    ,url: '/coll/clazz/list' //数据接口
+		    ,defaultToolbar: []
+		    ,toolbar: '#toolbar'
+		    ,page: {    	//开启分页
+		    	limit: 15
+		    }
+		    ,cols: [[ //表头
+		      {field: 'cId', title: 'ID', hide:true }
+		      ,{field: 'cNo', title: '班级编号', minWidth:80, align:'center'}
+		      ,{field: 'cName', title: '班级名称', minWidth:80, align:'center'}
+		      ,{field: 'cCreateDate', title: '录入时间', minWidth:280, align:'center', templet:function(r){return dateFormat(r.gCreateDate,'YYYY-MM-DD');}}
+		      ,{field: 'cNote', title: '备注', minWidth:180, align:'left'} 
+		      ,{field: '', title: '操作', toolbar: '#barDemo', align:'center'}
+		    ]]
+			,response: {
+			      statusCode: 0 //重新规定成功的状态码为 200，table 组件默认为 0
+		    }
+		    ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+		      return {
+		        "code": res.code, //解析接口状态
+		        "msg": res.msg, //解析提示文本
+		        "count": res.data.totalRows, //解析数据长度
+		        "data": res.data.rows //解析数据列表
+		      };
+		    }
+		  });
+	
+		  //监听工具条
+		  table.on('tool(tb_org)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'edit'){
+		    	edit(layer, obj);
+		    }
+		  });
+		  
+		  //监听工具栏
+		  table.on('toolbar(tb_org)', function(obj){
+			  if('newOrg'===obj.event){
+				  add(layer);
+			  }
+		  });
+		
+		  $('#btn_filter').bind('click', function(e){
+			  var infos=$.serializeObject($('#f_con'));
+			  table.reload('tb_org', {
+				  //设定异步数据接口的额外参数，任意设
+				  where: infos
+			   }); //只重载数据
+		  });
+	});
+	
+});
+</script>
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+<script type="text/html" id="toolbar">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="newOrg">添加班级</button>
+  </div>
+</script>
+
+
+<div id="org_editor" class="page-content row" style="display:none;overflow-x:hidden;overflow-y:auto; ">
+	
+	<!-- /section:settings.box -->
+	<div class="page-header">
+		<h1>
+			<p id="orgIdTxt">班级信息变更</p>
+			<!-- 
+			<small>
+				<i class="ace-icon fa fa-angle-double-right"></i>
+				常规变更
+			</small>
+			 -->
+		</h1>
+	</div><!-- /.page-header -->
+
+	<div class="row">
+		<div class="col-xs-12">
+			<!-- PAGE CONTENT BEGINS -->
+			<form class="form-horizontal" role="form" id="f_org_edited">
+				<div id="org_add_id" class="form-group">
+			 		<label for="cId" class="col-sm-3 control-label no-padding-right">班级ID</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 from-inline">
+						<input type="text" id="cId" name="cId" class="full" placeholder="班级ID">
+					</div>
+			 	</div>
+			 	
+			 	<!-- #section:elements.form -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="cNo">班级编号</label>
+
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<input type="text" id="cNo" name="cNo" class="full" placeholder="班级编号" />
+					</div>
+				</div>
+				<!-- /section:elements.form -->
+				<div class="space-4"></div>
+				<!-- #section:elements.form -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="cName">班级名称</label>
+
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<input type="text" id="cName" name="cName" class="full" placeholder="班级名称" />
+					</div>
+				</div>
+				<!-- /section:elements.form -->
+				<div class="space-4"></div>
+				
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="cCreateDate">创建时间</label>
+					<div class="col-xs-9 col-sm-9 col-lg-5 ">
+						<!-- #section:plugins/date-time.datepicker -->
+						<div class="input-group">
+							<input readOnly class="form-control date-picker full" id="cCreateDate" name="cCreateDate" type="text" data-date-format="yyyy-mm-dd" />
+							<span class="input-group-addon">
+								<i class="fa fa-calendar bigger-110"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+				<div class="space-4"></div>
+				
+				<div class="space-4" />
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right" for="cNote">备注</label>
+
+					<div class="col-xs-9 col-sm-9 col-lg-5">
+						<textarea id="cNote" name="cNote" class="textarea_pub"/>
+					</div>
+				</div>
+				
+				<div class="space-4" />
+			</form>
+			<script>
+			$(function(){
+				$('.date-picker').datepicker({
+					autoclose: true,
+					todayHighlight: true
+				});
+			});
+			</script>
+		</div><!-- /.col -->
+	</div><!-- /.row -->
+</div><!-- /.page-content -->
+
+<!-- 设置select2 下拉框问题 -->
+<div id="w" style="position:absolute;z-index:19892018">
+</div>

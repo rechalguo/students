@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.CTermedMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CTermed" >
+    <id column="T_ID" property="tId" jdbcType="BIGINT" />
+    <result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+    <result column="T_STAT" property="tStat" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    T_ID, M_NO, T_STAT
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CTermedExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_TERMED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_TERMED
+    where T_ID = #{tId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from C_TERMED
+    where T_ID = #{tId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="rechal.apps.coll.entity.CTermedExample" >
+    delete from C_TERMED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="rechal.apps.coll.entity.CTermed" >
+    insert into C_TERMED (T_ID, M_NO, T_STAT)
+    values (#{tId,jdbcType=BIGINT}, #{mNo,jdbcType=VARCHAR}, #{tStat,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="rechal.apps.coll.entity.CTermed" >
+    insert into C_TERMED
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="tId != null" >
+        T_ID,
+      </if>
+      <if test="mNo != null" >
+        M_NO,
+      </if>
+      <if test="tStat != null" >
+        T_STAT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="tId != null" >
+        #{tId,jdbcType=BIGINT},
+      </if>
+      <if test="mNo != null" >
+        #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tStat != null" >
+        #{tStat,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="rechal.apps.coll.entity.CTermedExample" resultType="java.lang.Integer" >
+    select count(*) from C_TERMED
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update C_TERMED
+    <set >
+      <if test="record.tId != null" >
+        T_ID = #{record.tId,jdbcType=BIGINT},
+      </if>
+      <if test="record.mNo != null" >
+        M_NO = #{record.mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tStat != null" >
+        T_STAT = #{record.tStat,jdbcType=CHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update C_TERMED
+    set T_ID = #{record.tId,jdbcType=BIGINT},
+      M_NO = #{record.mNo,jdbcType=VARCHAR},
+      T_STAT = #{record.tStat,jdbcType=CHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="rechal.apps.coll.entity.CTermed" >
+    update C_TERMED
+    <set >
+      <if test="mNo != null" >
+        M_NO = #{mNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tStat != null" >
+        T_STAT = #{tStat,jdbcType=CHAR},
+      </if>
+    </set>
+    where T_ID = #{tId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="rechal.apps.coll.entity.CTermed" >
+    update C_TERMED
+    set M_NO = #{mNo,jdbcType=VARCHAR},
+      T_STAT = #{tStat,jdbcType=CHAR}
+    where T_ID = #{tId,jdbcType=BIGINT}
+  </update>
+</mapper>

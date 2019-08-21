@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.ScoreMapper" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CMark" >
+    <id column="M_ID" property="mId" jdbcType="BIGINT" />
+    <result column="M_NO" property="mNo" jdbcType="VARCHAR" />
+    <result column="C_ID" property="cId" jdbcType="BIGINT" />
+    <result column="M_DATE" property="mDate" jdbcType="DATE" />
+    <result column="S_NO" property="sNo" jdbcType="VARCHAR" />
+    <result column="S_NAME" property="sName" jdbcType="VARCHAR" />
+    <result column="M_NOTE" property="mNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    M_ID, M_NO, C_ID, M_DATE, S_NO, S_NAME, M_NOTE
+  </sql>
+  
+  <!-- rechal.apps.coll.entity.CMark -->
+  <insert id="insertBatch" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyProperty="mId"  keyColumn="M_ID">
+    insert into C_MARK (M_NO, C_ID, 
+      M_DATE, S_NO, S_NAME, M_NOTE ${courses}
+      )
+    values 
+    <foreach collection="list" item="scores" index="index" separator="," >
+    (#{scores.mNo,jdbcType=VARCHAR}, #{scores.cId,jdbcType=BIGINT}, 
+      #{scores.mDate,jdbcType=DATE}, #{scores.sNo,jdbcType=VARCHAR}, 
+      #{scores.sName,jdbcType=VARCHAR}, #{scores.mNote,jdbcType=VARCHAR} ${scores.scores}
+      )
+      </foreach>
+  </insert>
+  
+   <select id="selectTableColumns" resultType="java.util.HashMap" parameterType="java.lang.String">
+   <choose>
+        <when test="@org.apache.commons.lang3.StringUtils@isNotBlank(mNo)">
+            SELECT CONCAT('M_', UPPER(M.K_NO)) C_NO, 
+			   	C.K_NAME C_NAME,
+			   	TO_CHAR(M.MS_WEIGHT,'0.9999') WEIGHT,
+			   	TO_CHAR(M.MS_LINE, '9999') MS_MARKED
+			   FROM C_MARKED M,
+			   	    C_COURSE C 
+			   WHERE M.M_NO=#{mNo,jdbcType=VARCHAR}
+			     AND M.K_NO=C.K_NO
+        </when>
+        <otherwise>
+		   SELECT T.COLUMN_NAME C_NO, 
+		    	C.K_NAME C_NAME 
+		    FROM INFORMATION_SCHEMA.COLUMNS  t,
+		    	C_COURSE C 
+		    where t.table_name = 'C_MARK' 
+		    	AND T.ORDINAL_POSITION >7 
+		    	AND T.COLUMN_NAME=CONCAT('M_',UPPER(C.K_NO))
+        </otherwise>
+    </choose>
+   </select>
+  <!-- 
+  <insert id="batchInsert" parameterType="List">
+    insert into TB_SystemInfo (systemID, systemName, createTime,createID,updateUserID, updateTime) values
+    <foreach collection="list" item="SystemInfo" index="index" separator="," >
+      (#{SystemInfo.systemID}, #{SystemInfo.systemName}, #{SystemInfo.createTime}, #{SystemInfo.createID}, #{SystemInfo.updateUserID}, #{SystemInfo.updateTime}, )
+    </foreach>
+  </insert>
+   -->
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   <select id="selectByPage" resultType="java.util.HashMap" parameterType="rechal.apps.coll.model.ScoreModel">
+   SELECT 
+   		M.*, 
+   		C.C_NAME, 
+	    <choose>
+	        <when test="@org.apache.commons.lang3.StringUtils@isNotBlank(coll)">
+	            ${coll} ZH
+	        </when>
+	        <otherwise>
+			   (IFNULL(M.M_YUMEN,0)+IFNULL(M.M_SHUXUE,0)+IFNULL(M.M_ENLIGSH,0)) ZH
+	        </otherwise>
+	    </choose>
+   FROM C_MARK  M,
+    	C_CLASS C 
+   WHERE M.C_ID = C.C_ID
+     AND M.M_NO = #{score.mNo,jdbcType=VARCHAR}
+     <if test="score.cId != null " >
+     AND M.C_ID = #{score.cId,jdbcType=BIGINT}
+     </if>
+     <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(score.sName)" >
+     <bind name="pattern" value="'%'+score.sName+'%'"/>
+     AND M.S_NAME LIKE #{pattern,jdbcType=VARCHAR}
+     </if>
+   
+     <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(orderByClause)" >
+	 ORDER BY ${orderByClause}
+     </if>
+   
+   </select>
+</mapper>

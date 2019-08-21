@@ -1,0 +1,254 @@
+		<div>
+		    <style>
+		    .btn_search{
+			    padding: 2px 4px 0 4px;
+				line-height: 24px;
+				border-width: 2px;
+				font-size: 12px;
+				float: right;
+				width: 40%;
+		    }
+		    .full{
+		    	width: 100% !important;
+		    }
+		    label.error
+	        {
+	            color:Red;
+	            font-size:13px;
+	            margin-left:5px;
+	            padding-left:16px;
+	            background:url("/assets/users/img/error.png") left no-repeat;
+	        }
+	        .textarea_pub {
+				width: 100%;
+				height: 70px;
+			}
+		    </style>
+			<!-- condition start -->
+			<div class="row">
+				<form id="f_con" action="">
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+						<select id="mNo" name="score.mNo" class="full" type="text" placeholder="学期编号" />
+					</div>
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+						<select id="cId" name="score.cId" class="full" type="text" placeholder="学期编号" />
+					</div>
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+						<input name="score.sName" class="full" type="text" placeholder="考生姓名" />
+					</div>
+					<div class="col-lg-2 col-sm-6 col-xs-12">
+				 		<button id="btn_filter" class="btn btn_search btn-purple" type="button">筛选</button>
+				 	</div>
+				</form>
+			<!-- condition end -->
+			</div>
+			<script>
+			$(function(){
+				$('#mNo').select2({
+					 ajax:{
+						 url: '/base/termed',
+						 type: 'get',
+						 dataType: 'json',
+						 data: function (params) {
+				             return {
+				                 p: params.term // search term 请求参数 ， 请求框中输入的参数
+				             };
+				         },
+				         processResults: function (data, params) {
+				             params.page = data.currentPage || 1;
+				             /*var itemList = [];//当数据对象不是{id:0,text:'ANTS'}这种形式的时候，可以使用类似此方法创建新的数组对象
+				             var arr = data.result.list
+				             for(item in arr){
+				                 itemList.push({id: item, text: arr[item]})
+				             }*/
+				             return {
+				                 results: data.rows,//itemList
+				                 pagination: {
+				                     more: (params.page * data.pageSize) < data.totalRows
+				                 }
+				             };
+				         },
+				         cache: true
+					 },
+					 minimumInputLength: 2,
+					 language:'zh-CN',
+				     placeholder: "学期考试编号",
+					 allowClear: false,
+					 multiple: false,
+				     escapeMarkup: function (markup) { return markup; }, // 自定义格式化防止xss注入
+				     formatResult: function(repo){ return repo.text;}, // 函数用来渲染结果
+				     formatSelection: function(repo){return repo.text;}, // 函数用于呈现当前的选择
+					 width: '100%',
+					 dropdownParent: $('#w')
+				});
+				$('#cId').select2({
+					 ajax:{
+						 url: '/base/clazz',
+						 type: 'get',
+						 dataType: 'json',
+						 data: function (params) {
+				             return {
+				                 "clazz.cNo": params.term // search term 请求参数 ， 请求框中输入的参数
+				             };
+				         },
+				         processResults: function (data, params) {
+				             params.page = data.currentPage || 1;
+				             /*var itemList = [];//当数据对象不是{id:0,text:'ANTS'}这种形式的时候，可以使用类似此方法创建新的数组对象
+				             var arr = data.result.list
+				             for(item in arr){
+				                 itemList.push({id: item, text: arr[item]})
+				             }*/
+				             return {
+				                 results: data.rows,//itemList
+				                 pagination: {
+				                     more: (params.page * data.pageSize) < data.totalRows
+				                 }
+				             };
+				         },
+				         cache: true
+					 },
+					 minimumInputLength: 1,
+					 language:'zh-CN',
+				     placeholder: "班级编号",
+					 allowClear: true,
+					 multiple: false,
+				     escapeMarkup: function (markup) { return markup; }, // 自定义格式化防止xss注入
+				     formatResult: function(repo){ return repo.text;}, // 函数用来渲染结果
+				     formatSelection: function(repo){return repo.text;}, // 函数用于呈现当前的选择
+					 width: '100%',
+					 dropdownParent: $('#w')
+				});
+			});
+			</script>
+		</div>
+	
+		<!-- 数据table -->
+		<table id="tb_org" lay-filter="tb_org">
+		</table>
+		<div class="vspace-12-sm"></div>
+
+
+<script src="/assets/users/js/jquery.format.js"></script>								
+<script th:inline="javascript">
+var colOther=[[(${colCourses})]];
+
+//格式YYYY/MM/DD HH:mm:ss
+function dateFormat(v, fmt){
+	if(v==null||''===v) return '';
+	return moment(v).format(fmt);
+}
+
+function numberFmt(v,fmt) {
+	if(v) return $.format.number(v, fmt);
+	return '';
+}
+$(function(){
+	
+	var cols=[ //表头
+	           {type: 'numbers', title: '序号', align:'center'}
+		      ,{field: 'M_NO', title: '学期考试编号', minWidth:80, align:'center'}
+		      ,{field: 'C_NAME', title: '班级', minWidth:80, align:'center'}
+		      ,{field: 'S_NO', title: '考生序号', minWidth:40, align:'right'}
+		      ,{field: 'S_NAME', title: '考生姓名', minWidth:60, align:'center'}
+		      ,{field: 'ZH', title: '总分(加权)', sort: true, minWidth:40, align:'right'}
+		    ]
+	
+	var columns=new Array();
+	$.extend(columns, cols);
+	$.each(colOther,function(i,item){
+		var c=new Object();
+		c.field=item.C_NO;
+		c.title=item.C_NAME;
+		c.minWidth=80;
+		c.align='right';
+		c.sort=true;
+		c.templet=function(row){
+			return numberFmt(row[item.C_NO], '####.00');
+		}
+		columns.push(c);
+	});
+	layui.use(['table', 'layer', 'upload'],function(){
+		var table=layui.table;
+		var layer=layui.layer;
+		var upload = layui.upload;
+		
+		var tbins=table.render({
+		    elem: '#tb_org'
+		    ,method: 'post'
+		    ,url: '/sta/score/list' //数据接口
+		    ,autoSort: false
+	    	,initSort: {
+	    	    field: 'ZH' //排序字段，对应 cols 设定的各字段名
+	    	    ,type: 'DESC' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+	    	  }
+		    ,page: {    	//开启分页
+		    	limit: 15
+		    }
+		    ,where: {
+				  "score.mNo": function(){
+					    return $('#mNo').val();
+					  }
+					}
+		    ,cols: [ columns ]
+			,response: {
+			      statusCode: 0 //重新规定成功的状态码为 200，table 组件默认为 0
+		    }
+		    ,parseData: function(res){ //将原始数据解析成 table 组件所规定的数据
+		      return {
+		        "code": res.code, //解析接口状态
+		        "msg": res.msg, //解析提示文本
+		        "count": res.data.totalRows, //解析数据长度
+		        "data": res.data.rows //解析数据列表
+		      };
+		    }
+		  });
+			//监听排序事件 
+			table.on('sort(tb_org)', function(obj){ //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+			  //console.log(obj.field); //当前排序的字段名
+			  //console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
+			  //console.log(this); //当前排序的 th 对象
+			  if(!obj.type || !obj.field) return;
+			  var orderByClause = obj.field + ' '+ obj.type;
+			  //尽管我们的 table 自带排序功能，但并没有请求服务端。
+			  //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
+			  var infos=$.serializeObject($('#f_con'));
+			  infos.orderByClause=orderByClause;
+			  tbins.reload({
+				  //设定异步数据接口的额外参数，任意设
+				  initSort: obj
+				  ,where: infos
+			   }); //只重载数据
+			});
+	
+		  //监听工具条
+		  table.on('tool(tb_org)', function(obj){
+		    var data = obj.data;
+		    if(obj.event === 'edit'){
+		    	edit(layer, obj);
+		    }
+		  });
+		  
+		  //监听工具栏
+		  table.on('toolbar(tb_org)', function(obj){
+			  if('newOrg'===obj.event){
+				  add(layer);
+			  }
+		  });
+		
+		  $('#btn_filter').bind('click', function(e){
+			  var infos=$.serializeObject($('#f_con'));
+			  tbins.reload({
+				  //设定异步数据接口的额外参数，任意设
+				  where: infos
+			   }); //只重载数据
+		  });
+	});
+	
+});
+
+</script>
+
+
+<!-- 设置select2 下拉框问题 -->
+<div id="w" style="position:absolute;z-index:19892018">
+</div>

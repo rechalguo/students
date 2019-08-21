@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="rechal.apps.coll.mapper.ext.CStuMapperExt" >
+  <resultMap id="BaseResultMap" type="rechal.apps.coll.entity.CStu" >
+    <id column="S_NO" property="sNo" jdbcType="VARCHAR" />
+    <result column="S_NAME" property="sName" jdbcType="VARCHAR" />
+    <result column="S_AGE" property="sAge" jdbcType="TINYINT" />
+    <result column="S_SEX" property="sSex" jdbcType="OTHER" />
+    <result column="S_BIRTH_DATE" property="sBirthDate" jdbcType="DATE" />
+    <result column="S_INTAKE_DATE" property="sIntakeDate" jdbcType="DATE" />
+    <result column="S_OUTTAKE_DATE" property="sOuttakeDate" jdbcType="DATE" />
+    <result column="S_TEL" property="sTel" jdbcType="VARCHAR" />
+    <result column="S_ADDR" property="sAddr" jdbcType="VARCHAR" />
+    <result column="S_CREATE_DATE" property="sCreateDate" jdbcType="DATE" />
+    <result column="S_NOTE" property="sNote" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    S_NO, S_NAME, S_AGE, S_SEX, S_BIRTH_DATE, S_INTAKE_DATE, S_OUTTAKE_DATE,
+    S_TEL, S_ADDR, S_CREATE_DATE, S_NOTE
+  </sql>
+  
+  <select id="selectByPage" resultMap="BaseResultMap" parameterType="rechal.apps.coll.entity.CStuExample" >
+    select
+    <include refid="Base_Column_List" />
+    from C_STU
+    WHERE 1=1
+    <if test="stu.sName != null and ''.toString()!=stu.sName" >
+    <bind name="pattern" value="'%'+stu.sName+'%'"/>
+    AND  S_NAME LIKE #{pattern,jdbcType=VARCHAR}
+    </if>
+    
+    <if test="stu.sNo != null and ''.toString()!=stu.sNo" >
+    AND  S_NO = #{stu.sNo,jdbcType=VARCHAR}
+    </if>
+  </select>
+ 
+</mapper>
